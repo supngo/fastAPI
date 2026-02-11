@@ -1,0 +1,141 @@
+############################
+# Python bytecode
+############################
+__pycache__/
+*.py[cod]
+*$py.class
+
+############################
+# C extensions
+############################
+*.so
+
+############################
+# Distribution / packaging
+############################
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+############################
+# Virtual environments
+############################
+# venv / custom env names
+venv/
+env/
+ENV/
+be/
+ds/
+.venv/
+
+############################
+# Conda
+############################
+.conda/
+conda-meta/
+
+############################
+# Pip
+############################
+pip-log.txt
+pip-delete-this-directory.txt
+
+############################
+# Unit test / coverage
+############################
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+############################
+# Jupyter Notebook
+############################
+.ipynb_checkpoints
+
+############################
+# VS Code
+############################
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+############################
+# IDEs
+############################
+.idea/
+*.swp
+*.swo
+
+############################
+# Logs
+############################
+*.log
+
+############################
+# OS files
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# Environment variables
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Mypy / type checking
+############################
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+############################
+# Pyre
+############################
+.pyre/
+
+############################
+# Ruff
+############################
+.ruff_cache/
+
+############################
+# Pyright
+############################
+.pyright/
+
+############################
+# Local data (optional)
+############################
+data/
+*.sqlite3
+*.db
+
+############################
+# Jupyter exported files
+############################
+*.nbconvert.ipynb
