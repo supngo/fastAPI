@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import Generator
 
-from app.security.token import decode_access_token
+from app.security.token import TokenPayload, decode_access_token
 from app.config.db_config import SessionLocal
 from app.models.user import User
 from app.security.roles import Role
@@ -36,7 +36,10 @@ def get_current_user(
     Extract current user from JWT token and fetch from DB.
     """
     try:
-        payload = decode_access_token(credentials.credentials)
+        payload_dict = decode_access_token(credentials.credentials)
+        
+        # Validate payload structure + email format
+        payload = TokenPayload(**payload_dict)
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 

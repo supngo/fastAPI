@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Header, Body, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from fastapi import Request
 
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
@@ -13,6 +14,8 @@ from app.services.refresh_token_service import (
 )
 from app.security.token import create_access_token, generate_refresh_token
 from app.core.logging import get_logger
+
+from app.core.rate_limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -30,12 +33,19 @@ class LoginRequest(BaseModel):
 # Login endpoint
 # ---------------------------
 @router.post("/login")
-def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")  # max 5 login attempts per minute per IP
+def login(
+    request: Request,
+    payload: LoginRequest,
+    response: Response,
+    db: Session = Depends(get_db)
+):
     user = authenticate_user(db, payload.email, payload.password)
     
     access_token = create_access_token({
         "sub": str(user.id),
         "role": user.role,
+        "email": user.email
     })
 
     raw_refresh = generate_refresh_token()
@@ -97,7 +107,11 @@ def refresh_token(
     revoke_token(db, token, replaced_by_id=new_token.id)
 
     # Create new access token
-    access_token = create_access_token({"sub": str(token.user_id)})
+    access_token = create_access_token({
+        "sub": str(token.user_id),
+        "role": token.user.role,
+        "email": token.user.email
+    })
 
     # Set cookie for browser clients
     response.set_cookie(

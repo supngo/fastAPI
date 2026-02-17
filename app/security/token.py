@@ -6,12 +6,18 @@ import os
 import secrets
 import hashlib
 from dotenv import load_dotenv
+from pydantic import BaseModel, EmailStr
 
 load_dotenv()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
+class TokenPayload(BaseModel):
+    sub: int           # user id
+    email: EmailStr    # validated email from token
+    role: str
+    exp: int           # expiration timestamp
 
 def generate_refresh_token() -> str:
     # 64-byte secure random string
