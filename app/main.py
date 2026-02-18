@@ -18,7 +18,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi import _rate_limit_exceeded_handler
 
-
+import os
 setup_logging()
 logger = get_logger("main")
 
@@ -83,4 +83,7 @@ def forbidden_handler(request, exc: ForbiddenError):
 @app.get("/health")
 def health_check():
     logger.info("Health check called")
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "color": os.getenv("APP_COLOR", "unknown")
+    }

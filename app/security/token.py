@@ -13,11 +13,12 @@ load_dotenv()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
+# Token payload validation (as you requested)
 class TokenPayload(BaseModel):
-    sub: int           # user id
-    email: EmailStr    # validated email from token
+    sub: str  # user id
+    exp: int   # expiration timestamp
+    email: EmailStr
     role: str
-    exp: int           # expiration timestamp
 
 def generate_refresh_token() -> str:
     # 64-byte secure random string
@@ -26,11 +27,27 @@ def generate_refresh_token() -> str:
 def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
+# def create_access_token(data: dict):
+#     to_encode = data.copy()
+#     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     to_encode.update({"exp": expire, "type": "access"})
+#     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def create_access_token(data: dict) -> str:
+    payload = data.copy()
+
+    # 1️⃣ Add expiration (unique every time)
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "type": "access"})
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    payload["exp"] = int(expire.timestamp())   # ✅ convert to int
+    payload["type"] = "access"
+    # payload.update({"exp": expire, "type": "access"})
+
+    # 2️⃣ add jti to guarantee uniqueness
+    payload["jti"] = secrets.token_hex(8)
+
+    # 3️⃣ Encode the token
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
 
 def decode_access_token(token: str):
     payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])

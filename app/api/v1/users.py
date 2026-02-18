@@ -25,12 +25,11 @@ def create_user_endpoint(
     db: Session = Depends(get_db),
 ):
     try:
-        user = create_user(
+        return create_user(
         db=db,
         email=payload.email,
         password=payload.password,
         role=payload.role,
     )
-        return create_user(db, payload)
     except Exception:
         raise HTTPException(status_code=400, detail="User already exists")

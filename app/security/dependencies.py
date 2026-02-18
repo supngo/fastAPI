@@ -7,6 +7,7 @@ from app.security.token import TokenPayload, decode_access_token
 from app.config.db_config import SessionLocal
 from app.models.user import User
 from app.security.roles import Role
+import uuid
 
 # ---------------------------
 # Security scheme
@@ -40,10 +41,10 @@ def get_current_user(
         
         # Validate payload structure + email format
         payload = TokenPayload(**payload_dict)
+        user_id = uuid.UUID(payload.sub)  # 🔥 convert string -> UUID
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
-
-    user = db.query(User).filter(User.id == payload["sub"]).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user

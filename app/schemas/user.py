@@ -17,9 +17,3 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True  # allows SQLAlchemy -> Pydantic conversion
-
-
-# Token payload validation (as you requested)
-class TokenPayload(BaseModel):
-    sub: UUID  # user id
-    exp: int   # expiration timestamp

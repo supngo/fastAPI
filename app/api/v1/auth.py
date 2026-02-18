@@ -42,6 +42,9 @@ def login(
 ):
     user = authenticate_user(db, payload.email, payload.password)
     
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     access_token = create_access_token({
         "sub": str(user.id),
         "role": user.role,
@@ -89,9 +92,9 @@ def refresh_token(
         or x_refresh_token
         or body_token
     )
-    logger.info("-> x_refresh_token:", x_refresh_token)
-    logger.info("-> body_token:", body_token)
-    logger.info("-> cookies:", request.cookies.get("refresh_token"))
+    # logger.info("-> x_refresh_token:", x_refresh_token)
+    # logger.info("-> body_token:", body_token)
+    # logger.info("-> cookies:", request.cookies.get("refresh_token"))
 
     if not raw_token:
         raise HTTPException(status_code=401, detail="Missing refresh token")
@@ -100,23 +103,23 @@ def refresh_token(
     if not token:
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
-    # 🔁 Rotate refresh token
-    new_raw = generate_refresh_token()
-    new_token = create_refresh_token(db, token.user_id, new_raw)
-
-    revoke_token(db, token, replaced_by_id=new_token.id)
-
     # Create new access token
+    user = token.user
     access_token = create_access_token({
-        "sub": str(token.user_id),
-        "role": token.user.role,
-        "email": token.user.email
+        "sub": str(user.id),
+        "role": user.role,
+        "email": user.email
     })
+
+    # 🔁 Rotate refresh token
+    # new_raw = generate_refresh_token()
+    # new_token = create_refresh_token(db, user.id, new_raw)
+    # revoke_token(db, token, replaced_by_id=new_token.id)
 
     # Set cookie for browser clients
     response.set_cookie(
         key="refresh_token",
-        value=new_raw,
+        value=raw_token,
         httponly=True,
         secure=False,  # True in production (HTTPS)
         samesite="lax",
@@ -125,7 +128,7 @@ def refresh_token(
 
     return {
         "access_token": access_token,
-        "refresh_token": new_raw,  # for API-only clients
+        "refresh_token": raw_token,  # for API-only clients
         "token_type": "bearer",
     }
 
