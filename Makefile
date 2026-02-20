@@ -9,5 +9,8 @@ init:
 seed:
 	python -m app.scripts.seed_db
 
+test:
+	pytest -v
+
 format:
 	black app

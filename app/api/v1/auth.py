@@ -97,10 +97,12 @@ def refresh_token(
     # logger.info("-> cookies:", request.cookies.get("refresh_token"))
 
     if not raw_token:
+        logger.exception(f"Missing refresh token")
         raise HTTPException(status_code=401, detail="Missing refresh token")
 
     token = get_valid_refresh_token(db, raw_token)
     if not token:
+        logger.exception(f"Invalid refresh token")
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     # Create new access token

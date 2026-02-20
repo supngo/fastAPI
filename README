@@ -1,0 +1,62 @@
+
+
+## Run Local Stand Alone
+
+### 1. Initialize the DB
+```make init```
+
+### 2. Seed the DB
+```make seed```
+
+### 3. Run stand alone app locally
+```make run```
+
+### 4. Run Unit Test
+```make test```
+
+### 5. Run Integration Test
+```make test```
+
+## Run Local Docker (docker compose)
+
+### 1. Build the whole thing
+```docker compose build```
+
+#### Or build with no cache
+```docker compose build --no-cache```
+
+### 2. Run migrations (migrate DB first)
+```docker compose run migrate```
+
+### 3. Start blue stack
+```docker compose up -d backend_blue nginx```
+
+### 4. Deploy new version to green
+```docker compose up -d --build backend_green```
+
+### 5. Switch nginx upstream to green
+```docker exec nginx nginx -s reload```
+
+### 6. View log on a certain container
+``` docker logs -f backend_blue```
+
+### 7. Log into a certain container
+```docker exec -it backend_blue```
+
+### 8. Start the whole thing
+```docker compose up -d```
+
+### 9. Shutdow the whole thing
+```docker compose down -v```
+
+### 10. List all running containers
+```docker ps```
+
+### 11. List all docker images
+```docker images```
+
+### 12. Delete docker images
+```docker rmi -f ImageID```
+
+### 13. Stop a docker running instance
+```docker stop ContainID```

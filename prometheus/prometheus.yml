@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "backend"
+    static_configs:
+      - targets:
+          - backend_blue:8000
+          - backend_green:8000

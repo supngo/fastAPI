@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.request_id import RequestIDMiddleware
 from fastapi.responses import JSONResponse
 
 # Import routers
@@ -17,8 +18,9 @@ from app.core.rate_limiter import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi import _rate_limit_exceeded_handler
-
+from prometheus_fastapi_instrumentator import Instrumentator
 import os
+
 setup_logging()
 logger = get_logger("main")
 
@@ -31,6 +33,8 @@ app = FastAPI(
 # Add middleware
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(RequestIDMiddleware)
+
 
 # Add exception handler
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -87,3 +91,6 @@ def health_check():
         "status": "ok",
         "color": os.getenv("APP_COLOR", "unknown")
     }
+
+# 🔥 Prometheus metrics endpoint: /metrics
+Instrumentator().instrument(app).expose(app)
