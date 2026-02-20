@@ -56,7 +56,15 @@
 ```docker images```
 
 ### 12. Delete docker images
-```docker rmi -f ImageID```
+```docker rmi -f ImageID```s
 
 ### 13. Stop a docker running instance
 ```docker stop ContainID```
+
+## Obverability
+
+### Prometheus (metrics)
+```http://localhost:9090```
+
+### Grafana (dashboard)
+```http://localhost:3001```
